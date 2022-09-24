@@ -1,0 +1,45 @@
+ setChats(snapshot.docs.map((doc) => ({
+        id: doc.id,
+        data: doc.data(),
+ })))
+      
+ //hader
+
+  // headerLeft: () => (
+            //     <TouchableOpacity
+            //         style={{ marginLeft: 10 }}
+            //         onPress={navigation.goBack}
+            //     >
+            //            <AntDesign name="arrowleft" size={24} color="white" /> 
+            //     </TouchableOpacity>
+            // ),
+//sending message
+const sendMessage = () => {
+       const docRef = doc(db, "chats", route.params.id);
+       const colRef = collection(docRef, "messages");
+       addDoc(colRef, {
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              message: input,
+              displayName: auth.currentUser.displayName,
+              email: auth.currentUser.email,
+              photoURL: auth.currentUser.photoURL
+       })
+       setInput('')
+       console.log(id);
+       Keyboard.dismiss();
+
+       return sendMessage;
+}
+//
+
+useEffect(() => {
+       //TODO: error 
+       (async () => {
+              const docRef = doc(db, "chats", id);
+              const colRef = collection(docRef, "messages");
+              const q = query(colRef, orderBy("timestamp", "desc"))
+              const unsubscribe = onSnapshot(q, (snapshot => setChatMessages(
+                     snapshot.docs.map((doc) => doc.data()))));
+              return unsubscribe;
+       })();
+},[])
